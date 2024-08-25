@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
+#include <vector>
 
 namespace ProjectManager {
 Application::Application(const std::string &_template_dir,
@@ -29,6 +30,16 @@ bool Application::RemoveDir(const std::string &_path) {
 
 bool Application::CreateDir(const std::string &_path) {
   return std::filesystem::create_directory(_path);
+}
+
+std::vector<std::string> Application::ListDir(const std::string &_path) {
+  std::vector<std::string> out;
+
+  for (const auto &dir : std::filesystem::directory_iterator(_path)) {
+    out.push_back(dir.path().filename());
+  }
+
+  return out;
 }
 
 bool Application::CopyDir(const std::string &_destination,

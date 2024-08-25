@@ -2,6 +2,7 @@
 #include "GArgs.hpp"
 
 #include <string>
+#include <vector>
 
 namespace ProjectManager {
 class Application {
@@ -16,6 +17,7 @@ public:
   bool SetupTemplateDir();
   bool RemoveDir(const std::string &_path);
   bool CreateDir(const std::string &_path);
+  std::vector<std::string> ListDir(const std::string &_path);
   bool CopyDir(const std::string &_destination, const std::string &_source);
   bool Exists(const std::string &_path);
 
