@@ -42,6 +42,15 @@ std::vector<std::string> Application::ListDir(const std::string &_path) {
   return out;
 }
 
+std::string Application::AbsPath(const std::string &_path) {
+  return std::filesystem::absolute(_path);
+}
+
+std::string Application::GetContainingDir(const std::string &_path) {
+  std::filesystem::path p = _path;
+  return p.parent_path();
+}
+
 bool Application::CopyDir(const std::string &_destination,
                           const std::string &_source) {
 
