@@ -19,6 +19,8 @@ int main(int argc, char *argv[]) {
   app.parser.AddKey(GArgs::Key("command", "create", "Creates a new Project"));
   app.parser.AddKey(
       GArgs::Key("command", "delete", "Deletes an existing Project"));
+  app.parser.AddKey(GArgs::Key("command", "rename",
+                               "Rename a Project created with the tool"));
   app.parser.AddKey(GArgs::Key("command", "add_template",
                                "Adds a new Project template to generate"));
   app.parser.AddKey(GArgs::Key("command", "remove_template",
@@ -156,6 +158,35 @@ int main(int argc, char *argv[]) {
         return 0;
       } else {
         std::cerr << "Failed to create project" << std::endl;
+        return 1;
+      }
+    }
+  }
+
+  if (app.parser.Contains("command", "rename")) {
+    if (app.parser["directory"] == "") {
+      std::cerr << "No directory given for source" << std::endl;
+      return 1;
+    }
+
+    if (app.parser["name"] == "") {
+      std::cerr << "New Project name not given" << std::endl;
+      return 1;
+    } else {
+      const std::string projectPathOld = app.AbsPath(app.parser["directory"]);
+      const std::string projectPathNew =
+          app.GetContainingDir(projectPathOld) + '/' + app.parser["name"];
+
+      if (app.CopyDir(projectPathNew, projectPathOld)) {
+        if (app.RemoveDir(projectPathOld)) {
+          std::cout << "Successfully renamed project" << std::endl;
+          return 0;
+        } else {
+          std::cerr << "Failed to remove old directory" << std::endl;
+          return 1;
+        }
+      } else {
+        std::cerr << "Failed to copy project content" << std::endl;
         return 1;
       }
     }
