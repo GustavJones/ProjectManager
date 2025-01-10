@@ -6,4 +6,12 @@ add_executable(ProjectManager ${SOURCES})
 target_include_directories(ProjectManager PRIVATE ../../include/ ../../external/GArgs/include/)
 target_link_libraries(ProjectManager PRIVATE GArgs)
 
-install(TARGETS ProjectManager RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS ProjectManager)
+
+file(GLOB TEMPLATES "../../templates/*")
+
+foreach(TEMPLATE ${TEMPLATES})
+  if(IS_DIRECTORY ${TEMPLATE})
+    install(DIRECTORY ${TEMPLATE} DESTINATION /opt/ProjectManager/)
+  endif()
+endforeach()
