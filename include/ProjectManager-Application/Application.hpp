@@ -1,5 +1,5 @@
 #pragma once
-#include "GArgs.hpp"
+#include "GArgs/GArgs.hpp"
 
 #include <string>
 #include <vector>

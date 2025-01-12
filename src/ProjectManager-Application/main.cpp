@@ -1,4 +1,4 @@
-#include "GArgs.hpp"
+#include "GArgs/GArgs.hpp"
 #include "ProjectManager-Application/Application.hpp"
 #include <iostream>
 
@@ -39,23 +39,25 @@ int main(int argc, char *argv[]) {
   // Set Template Directory from argument
   const std::string templateDirStr = "--template_dir";
   if (app.parser.Contains("flags", templateDirStr)) {
-    int startIndex =
-        app.parser["flags"].find(templateDirStr) + templateDirStr.length() + 1;
-    int endIndex = app.parser["flags"].find(' ', startIndex);
-    app.templateDir =
-        app.parser["flags"].substr(startIndex, endIndex - startIndex);
+    for(auto flag : app.parser["flags"]) {
+      unsigned long index = flag.find(templateDirStr);
+      if (index != flag.npos) {
+        flag.erase(index, templateDirStr.length() + 1);
+        app.templateDir = flag;
+      }
+    }
   }
 
   app.SetupTemplateDir();
 
   // Remove template
   if (app.parser.Contains("command", "remove_template")) {
-    if (app.parser["name"] == "") {
+    if (app.parser["name"].size() == 0) {
       std::cerr << "Template name not given" << std::endl;
       return 1;
     } else {
       const std::string templatePath =
-          app.templateDir + "/" + app.parser["name"];
+          app.templateDir + "/" + app.parser["name"][0];
 
       if (!app.Exists(templatePath)) {
         std::cout << "Template doesn't exist" << std::endl;
@@ -74,19 +76,19 @@ int main(int argc, char *argv[]) {
 
   // Create Template
   if (app.parser.Contains("command", "add_template")) {
-    if (app.parser["directory"] == "") {
+    if (app.parser["directory"].size() == 0) {
       std::cerr << "No directory given for source" << std::endl;
       return 1;
     }
 
-    if (app.parser["name"] == "") {
+    if (app.parser["name"].size() == 0) {
       std::cerr << "Template name not given" << std::endl;
       return 1;
     } else {
       const std::string templatePath =
-          app.templateDir + '/' + app.parser["name"];
+          app.templateDir + '/' + app.parser["name"][0];
 
-      const std::string copyPath = app.parser["directory"];
+      const std::string copyPath = app.parser["directory"][0];
 
       if (app.Exists(templatePath)) {
         std::cout << "Template already exists" << std::endl;
@@ -116,20 +118,20 @@ int main(int argc, char *argv[]) {
 
   // Delete Project
   if (app.parser.Contains("command", "delete")) {
-    if (app.parser["directory"] == "") {
+    if (app.parser["directory"].size() == 0) {
       std::cerr << "No directory given for source" << std::endl;
       return 1;
     }
 
-    if (app.parser["name"] == "") {
+    if (app.parser["name"].size() == 0) {
       std::cerr << "Project name not given" << std::endl;
       return 1;
     } else {
       const std::string projectPath =
-          app.parser["directory"] + '/' + app.parser["name"];
+          app.parser["directory"][0] + '/' + app.parser["name"][0];
 
       if (app.RemoveDir(projectPath)) {
-        std::cout << "Deleted project " << app.parser["name"] << std::endl;
+        std::cout << "Deleted project " << app.parser["name"][0] << std::endl;
         return 0;
       } else {
         std::cerr << "Failed to delete project" << std::endl;
@@ -140,21 +142,21 @@ int main(int argc, char *argv[]) {
 
   // Create Project
   if (app.parser.Contains("command", "create")) {
-    if (app.parser["directory"] == "") {
+    if (app.parser["directory"].size() == 0) {
       std::cerr << "No directory given for source" << std::endl;
       return 1;
     }
 
-    if (app.parser["name"] == "") {
+    if (app.parser["name"].size() == 0) {
       std::cerr << "Project template not given" << std::endl;
       return 1;
     } else {
       const std::string projectPath =
-          app.parser["directory"] + '/' + app.parser["name"];
+          app.parser["directory"][0] + '/' + app.parser["name"][0];
 
       if (app.CopyDir(projectPath,
-                      app.templateDir + '/' + app.parser["name"])) {
-        std::cout << "Project created from " << app.parser["name"] << std::endl;
+                      app.templateDir + '/' + app.parser["name"][0])) {
+        std::cout << "Project created from " << app.parser["name"][0] << std::endl;
         return 0;
       } else {
         std::cerr << "Failed to create project" << std::endl;
@@ -164,18 +166,18 @@ int main(int argc, char *argv[]) {
   }
 
   if (app.parser.Contains("command", "rename")) {
-    if (app.parser["directory"] == "") {
+    if (app.parser["directory"].size() == 0) {
       std::cerr << "No directory given for source" << std::endl;
       return 1;
     }
 
-    if (app.parser["name"] == "") {
+    if (app.parser["name"].size() == 0) {
       std::cerr << "New Project name not given" << std::endl;
       return 1;
     } else {
-      const std::string projectPathOld = app.AbsPath(app.parser["directory"]);
+      const std::string projectPathOld = app.AbsPath(app.parser["directory"][0]);
       const std::string projectPathNew =
-          app.GetContainingDir(projectPathOld) + '/' + app.parser["name"];
+          app.GetContainingDir(projectPathOld) + '/' + app.parser["name"][0];
 
       if (app.CopyDir(projectPathNew, projectPathOld)) {
         if (app.RemoveDir(projectPathOld)) {
