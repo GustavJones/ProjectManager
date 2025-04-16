@@ -1,9 +1,16 @@
 #include "GArgs/GArgs.hpp"
 #include "ProjectManager-Application/Application.hpp"
+#include <cstdlib>
 #include <filesystem>
 #include <iostream>
 
 int main(int argc, char *argv[]) {
+  #if __linux__
+    const std::filesystem::path USER_DIRECTORY = std::getenv("HOME");
+  #elif _WIN32
+    const std::filesystem::path USER_DIRECTORY = (std::string)std::getenv("HOMEDRIVE") + std::getenv("HOMEPATH");
+  #endif
+
   const std::string TEMPLATE_DIR_STRING = "--template-dir";
   const std::string LIST_TEMPLATES_STRING = "list-templates";
   const std::string ADD_TEMPLATE_STRING = "add-template";
@@ -13,7 +20,7 @@ int main(int argc, char *argv[]) {
   const std::string RENAME_STRING = "rename";
 
   ProjectManager::Application app(
-      "/opt/ProjectManager", GArgs::Parser("ProjectManager", "V1.0", true));
+      (USER_DIRECTORY / APPLICATION_NAME).string(), GArgs::Parser(APPLICATION_NAME, "V1.0", true));
 
   app.parser.AddStructure(
       "[flags:value_amount=0,argument_filter=-,help=Flag "
@@ -67,7 +74,7 @@ int main(int argc, char *argv[]) {
       return 1;
     }
     const std::string templatePath =
-        app.templateDir + "/" + app.parser["name"][0];
+        ((std::filesystem::path)app.templateDir / app.parser["name"][0]).string();
 
     if (!app.Exists(templatePath)) {
       std::cout << "Template doesn't exist" << std::endl;
@@ -95,7 +102,7 @@ int main(int argc, char *argv[]) {
     }
 
     const std::string templatePath =
-        app.templateDir + '/' + app.parser["name"][0];
+        ((std::filesystem::path)app.templateDir / app.parser["name"][0]).string();
 
     const std::string copyPath = app.parser["directory"][0];
 
@@ -137,7 +144,7 @@ int main(int argc, char *argv[]) {
     }
 
     const std::string projectPath =
-        app.parser["directory"][0] + '/' + app.parser["name"][0];
+        ((std::filesystem::path)app.parser["directory"][0] / app.parser["name"][0]).string();
 
     if (app.RemoveDir(projectPath)) {
       std::cout << "Deleted project " << app.parser["name"][0] << std::endl;
@@ -161,10 +168,10 @@ int main(int argc, char *argv[]) {
     }
 
     const std::string projectPath =
-        app.parser["directory"][0] + '/' + app.parser["name"][0];
+        ((std::filesystem::path)app.parser["directory"][0] / app.parser["name"][0]).string();
 
     if (app.CopyDir(projectPath,
-                    app.templateDir + '/' + app.parser["name"][0])) {
+                    ((std::filesystem::path)app.templateDir / app.parser["name"][0]).string())) {
       std::cout << "Project created from " << app.parser["name"][0]
                 << std::endl;
       return 0;
@@ -187,8 +194,8 @@ int main(int argc, char *argv[]) {
 
     const std::string projectNameOld = app.parser["name"][0];
     const std::string projectPathOld =
-        app.AbsPath((std::filesystem::path)app.parser["directory"][0] /
-                    projectNameOld);
+        app.AbsPath(((std::filesystem::path)app.parser["directory"][0] /
+                    projectNameOld).string());
 
     std::string projectPathNew = app.AbsPath(app.parser["directory"][0]);
     std::string projectNameNew;
@@ -203,7 +210,7 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    projectPathNew = (std::filesystem::path)projectPathNew / projectNameNew;
+    projectPathNew = ((std::filesystem::path)projectPathNew / projectNameNew).string();
 
     if (app.CopyDir(projectPathNew, projectPathOld)) {
       if (app.RemoveDir(projectPathOld)) {

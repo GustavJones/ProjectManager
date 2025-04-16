@@ -15,7 +15,7 @@ bool Application::SetupTemplateDir() {
   if (std::filesystem::exists(templateDir)) {
     return true;
   } else {
-    std::cout << "Template Directory doesn't exist. Creating now!" << std::endl;
+    std::cout << "Template Directory doesn't exist. Creating now! (" << templateDir << ')' << std::endl;
     return std::filesystem::create_directory(templateDir);
   }
 }
@@ -36,19 +36,19 @@ std::vector<std::string> Application::ListDir(const std::string &_path) {
   std::vector<std::string> out;
 
   for (const auto &dir : std::filesystem::directory_iterator(_path)) {
-    out.push_back(dir.path().filename());
+    out.push_back(dir.path().filename().string());
   }
 
   return out;
 }
 
 std::string Application::AbsPath(const std::string &_path) {
-  return std::filesystem::absolute(_path);
+  return std::filesystem::absolute(_path).string();
 }
 
 std::string Application::GetContainingDir(const std::string &_path) {
   std::filesystem::path p = _path;
-  return p.parent_path();
+  return p.parent_path().string();
 }
 
 bool Application::CopyDir(const std::string &_destination,
