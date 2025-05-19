@@ -1,17 +1,42 @@
 cmake_minimum_required(VERSION 3.15)
-project(Template ASM)
+project(Template)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_program(ASM_COMPILER NAMES ${CMAKE_ASM_COMPILER})
-find_program(ASM_LINKER NAMES ${CMAKE_ASM_LINKER})
+if(NOT DEFINED CMAKE_ASM_COMPILER)
+  message(STATUS "No CMAKE_ASM_COMPILER specified... Searching for NASM")
+  find_program(ASM_COMPILER NAMES "nasm" REQUIRED)
+  if(NOT DEFINED ASM_COMPILER-NOTFOUND)
+    message(STATUS "Found NASM. Setting CMAKE_ASM_COMPILER")
+  endif()
+  set(CMAKE_ASM_COMPILER ${ASM_COMPILER})
+endif()
 
-set(CMAKE_ASM_COMPILE_OBJECT "${ASM_COMPILER} <DEFINES> <INCLUDES> <FLAGS> -o <OBJECT> <SOURCE>")
-set(CMAKE_ASM_LINK_EXECUTABLE "${ASM_LINKER} <CMAKE_ASM_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+if(NOT DEFINED CMAKE_ASM_LINKER)
+  message(STATUS "No CMAKE_ASM_LINKER specified... Searching for LD")
+  find_program(ASM_LINKER NAMES "ld" REQUIRED)
+  if(NOT DEFINED ASM_LINKER-NOTFOUND)
+    message(STATUS "Found LD. Setting CMAKE_ASM_LINKER")
+  endif()
+  set(CMAKE_ASM_LINKER ${ASM_LINKER})
+endif()
+
+set(CMAKE_ASM_COMPILE_OBJECT "${CMAKE_ASM_COMPILER} <DEFINES> <INCLUDES> <FLAGS> -o <OBJECT> <SOURCE>" CACHE STRING "Structure of compile command" FORCE)
+set(CMAKE_ASM_LINK_EXECUTABLE "${CMAKE_ASM_LINKER} <CMAKE_ASM_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>" CACHE STRING "Structure of link command" FORCE)
+set(CMAKE_ASM_FLAGS -felf64)
 
 message(STATUS "COMPILING WITH: ${CMAKE_ASM_COMPILE_OBJECT}")
 message(STATUS "LINKING WITH: ${CMAKE_ASM_LINK_EXECUTABLE}")
 
-set(CMAKE_ASM_FLAGS -felf64)
+file(GLOB SUBMODULES "external/*")
+
+foreach(SUBMODULE ${SUBMODULES})
+  if(IS_DIRECTORY ${SUBMODULE})
+    if(EXISTS "${SUBMODULE}/CMakeLists.txt")
+      message(STATUS "Adding submodule: ${SUBMODULE}")
+      add_subdirectory(${SUBMODULE})
+    endif()
+  endif()
+endforeach()
 
 add_subdirectory(src)
