@@ -7,7 +7,7 @@ HelloWorldASM:
 
   ;; Do sum stuff
 
-  mov rax, 1 ; Return
+  mov rax, 4 ; Return
 
   mov rsp, rbp
   pop rbp
