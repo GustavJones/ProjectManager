@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(Template)
 
-option(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(BUILD_SHARED_LIBS OFF)
 option(BUILD_STATIC_LIBS ON)
