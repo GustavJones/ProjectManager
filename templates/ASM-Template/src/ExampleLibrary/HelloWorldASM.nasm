@@ -1,5 +1,7 @@
 section .text
 
+%include "ExampleLibrary/TestInclude.hsm"
+
 global HelloWorldASM
 HelloWorldASM:
   push rbp

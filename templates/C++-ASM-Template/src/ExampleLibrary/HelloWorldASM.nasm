@@ -5,7 +5,7 @@ HelloWorldASM:
   push rbp
   mov rbp, rsp
 
-  ;; Do sum stuff
+  ;; Do some stuff
 
   mov rax, 4 ; Return
 

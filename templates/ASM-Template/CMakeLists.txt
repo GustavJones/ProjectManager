@@ -1,22 +1,13 @@
 cmake_minimum_required(VERSION 3.15)
 project(Template)
+enable_language(ASM_NASM)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(BUILD_SHARED_LIBS OFF)
 option(BUILD_STATIC_LIBS ON)
 
-option(NASM_FREESTANDING "Whether to link NASM executables with the C compiler and C library" TRUE)
-
-find_program(ASM_COMPILER NAMES "nasm" REQUIRED)
-set(CMAKE_ASM_NASM_COMPILER ${ASM_COMPILER} CACHE PATH "NASM Assembler Path" FORCE)
-enable_language(ASM_NASM)
-
 string(REPLACE "<CMAKE_ASM_NASM_COMPILER>" "<CMAKE_C_COMPILER>" CMAKE_ASM_NASM_LINK_EXECUTABLE ${CMAKE_ASM_NASM_LINK_EXECUTABLE})
-
-if(NASM_FREESTANDING)
-  set(CMAKE_ASM_NASM_LINK_FLAGS "-nostdlib")
-endif()
 
 include(GNUInstallDirs)
 set(CMAKE_INSTALL_RPATH "$ORIGIN/${CMAKE_INSTALL_LIBDIR} ${CMAKE_INSTALL_FULL_LIBDIR}")
@@ -33,4 +24,4 @@ foreach(SUBMODULE ${SUBMODULES})
   endif()
 endforeach()
 
-add_subdirectory(src)
+include("src/sources.cmake")

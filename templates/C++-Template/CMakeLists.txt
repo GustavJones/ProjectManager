@@ -21,4 +21,4 @@ foreach(SUBMODULE ${SUBMODULES})
   endif()
 endforeach()
 
-add_subdirectory(src)
+include("src/sources.cmake")
