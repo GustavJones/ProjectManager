@@ -1,3 +1,3 @@
-[submodule "external/GArgs"]
+[submodule "GArgs"]
 	path = external/GArgs
-	url = https://github.com/GustavJones/GArgs
+	url = https://github.com/GustavJones/GArgs.git
